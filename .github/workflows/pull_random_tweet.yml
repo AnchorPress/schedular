@@ -1,0 +1,27 @@
+name: Call C# PullTwitterOpen API
+
+on:
+  schedule:
+    # Runs every 3 minutes; the actual call will happen randomly in that run
+    - cron: "*/60 * * * *"
+
+jobs:
+  call-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Random Delay (15 to 20 mins)
+        id: random-delay
+        run: |
+          DELAY=$((60*60))
+          echo "Delay: $DELAY seconds"
+          echo "delay=$DELAY" >> $GITHUB_OUTPUT
+
+      - name: Sleep for Delay
+        run: |
+          echo "Sleeping for ${{ steps.random-delay.outputs.delay }} seconds..."
+          sleep ${{ steps.random-delay.outputs.delay }}
+
+      - name: Call API
+        run: |
+          curl -X GET "https://anchor-press-api.azurewebsites.net/api/Twitter/PullTwitterOpen"
