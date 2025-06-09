@@ -12,4 +12,4 @@ jobs:
     steps:
       - name: Call API
         run: |
-          curl -X GET "https://anchor-press-api.azurewebsites.net/api/Twitter/PullTwitterOpen"
+          curl -X GET "https://anchor-press-api.azurewebsites.net/api/Schedular/PullTwitterOpen"
