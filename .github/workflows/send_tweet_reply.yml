@@ -30,4 +30,4 @@ jobs:
 
       - name: Call API
         run: |
-          curl -X GET "https://anchor-press-api.azurewebsites.net/api/Twitter/SendTweetReplyOpen"
+          curl -X GET "https://anchor-press-api.azurewebsites.net/api/Schedular/SendTweetReplyOpen"
