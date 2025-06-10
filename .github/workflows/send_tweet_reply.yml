@@ -8,9 +8,9 @@ on:
 
 jobs:
   call-api:
-    concurrency:
-      group: send-tweet-reply-open
-      cancel-in-progress: true
+    #concurrency:
+      #group: send-tweet-reply-open
+      #cancel-in-progress: true
 
     runs-on: ubuntu-latest
 
