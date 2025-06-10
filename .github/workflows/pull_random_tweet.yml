@@ -2,14 +2,15 @@ name: Call C# PullTwitterOpen API
 
 on:
   schedule:
-    # Runs every hour
-    - cron: "0 * * * *"
+    # Runs every hour at minute 0
+    - cron: '*/5 * * * *'
+  workflow_dispatch:  # Allows to trigger it manually from the GitHub UI
 
 jobs:
   call-api:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Call API
+      - name: Call PullTwitterOpen API
         run: |
-          curl -X GET "https://anchor-press-api.azurewebsites.net/api/Schedular/PullTwitterOpen"
+          curl --fail --show-error --silent -X GET "https://anchor-press-api.azurewebsites.net/api/Schedular/PullTwitterOpen"
