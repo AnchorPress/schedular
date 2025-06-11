@@ -3,7 +3,7 @@ name: Call C# PullTwitterOpen API
 on:
   schedule:
     # Runs every hour at minute 0
-    - cron: '*/5 * * * *'
+    - cron: '0 * * * *'
   workflow_dispatch:  # Allows to trigger it manually from the GitHub UI
 
 jobs:
@@ -13,4 +13,5 @@ jobs:
     steps:
       - name: Call PullTwitterOpen API
         run: |
-          curl --fail --show-error --silent -X GET "https://anchor-press-api.azurewebsites.net/api/Schedular/PullTwitterOpen"
+          curl --fail --show-error --silent -X GET https://anchor-press-api.azurewebsites.net/api/Schedular/PullTwitterOpen \
+          -H "X-API-KEY: ${{ secrets.SCHEDULER_SECRET_KEY }}"
