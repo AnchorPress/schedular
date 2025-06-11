@@ -32,4 +32,5 @@ jobs:
 
       - name: Call API
         run: |
-          curl --fail --show-error --silent -X GET "https://anchor-press-api.azurewebsites.net/api/Schedular/SendTweetReplyOpen"
+          curl --fail --show-error --silent -X GET https://anchor-press-api.azurewebsites.net/api/Schedular/SendTweetReplyOpen \
+          -H "X-API-KEY: ${{ secrets.SCHEDULER_SECRET_KEY }}"
