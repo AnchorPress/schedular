@@ -3,7 +3,7 @@ name: Call C# SendTweetReplyOpen API Randomly
 on:
   schedule:
     # Runs every 15 minutes
-    - cron: "*/15 * * * *"
+    - cron: "*/20 * * * *"
   workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 jobs:
