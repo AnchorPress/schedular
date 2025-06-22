@@ -1,4 +1,5 @@
 name: Call C# SendTweetReplyOpen API Randomly
+
 on:
   schedule:
     # Runs every 20 minutes
@@ -7,9 +8,6 @@ on:
 
 jobs:
   call-api:
-    #concurrency:
-      #group: send-tweet-reply-open
-      #cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - name: Generate Random Delay (15 to 20 mins)
@@ -19,34 +17,44 @@ jobs:
           MIN=900    # 15 * 60
           MAX=1200   # 20 * 60
           RANDOM_DELAY=$((RANDOM % (MAX - MIN + 1) + MIN))
+          WARMUP_DELAY=$((RANDOM_DELAY - 180))  # 3 mins before main delay
           echo "Random delay: $RANDOM_DELAY seconds"
+          echo "Warm-up delay: $WARMUP_DELAY seconds"
           echo "delay=$RANDOM_DELAY" >> $GITHUB_OUTPUT
+          echo "warmup=$WARMUP_DELAY" >> $GITHUB_OUTPUT
 
-      - name: Sleep for Random Delay
+      - name: Sleep Until Warm-up
         run: |
-          echo "Sleeping for ${{ steps.random-delay.outputs.delay }} seconds..."
-          sleep ${{ steps.random-delay.outputs.delay }}
+          echo "Sleeping for ${{ steps.random-delay.outputs.warmup }} seconds before warm-up ping..."
+          sleep ${{ steps.random-delay.outputs.warmup }}
+
+      - name: Warm-up Ping
+        run: |
+          echo "Sending warm-up request to prevent cold start..."
+          curl -s -o /dev/null -w "%{http_code}" https://anchor-press-api.azurewebsites.net/
+
+      - name: Sleep for Remaining Time
+        run: |
+          echo "Sleeping additional 180 seconds after warm-up..."
+          sleep 180
 
       - name: Call API with Error Handling
         id: api-call
         run: |
           echo "Calling SendTweetReplyOpen API..."
           
-          # Make API call and capture response
-          RESPONSE=$(curl -w "\nHTTP_STATUS:%{http_code}" \
+          RESPONSE=$(curl --max-time 60 --retry 3 --retry-delay 5 -w "\nHTTP_STATUS:%{http_code}" \
             -X GET https://anchor-press-api.azurewebsites.net/api/Schedular/SendTweetReplyOpen \
             -H "X-API-KEY: ${{ secrets.SCHEDULER_SECRET_KEY }}" \
             -H "Accept: application/json" \
             2>&1) || API_CALL_FAILED=true
           
-          # Extract HTTP status code and response body
           HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
           RESPONSE_BODY=$(echo "$RESPONSE" | sed '/HTTP_STATUS:/d')
-          
+
           echo "HTTP Status: $HTTP_STATUS"
           echo "Response Body: $RESPONSE_BODY"
           
-          # Check if API call failed or returned error status
           if [ "$API_CALL_FAILED" = true ]; then
             echo "API call failed completely (network/connection error)"
             echo "Error details: $RESPONSE_BODY"
